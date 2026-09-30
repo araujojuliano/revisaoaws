@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulado AWS CLF-C02</title>
+
+  <!-- Importação das Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:ital,wght@0,300..700;1,300..700&family=Google+Sans+Code:ital,wght,MONO@0,300..700,0..1;1,300..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Chart.js Core para os gráficos de desempenho -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" onerror="let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';document.head.appendChild(s)"></script>
+
+  <!-- Importação do ficheiro CSS externo -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="widget-container">
+    <div class="main-card">
+      
+      <!-- Cabeçalho (Header) -->
+      <div class="header-bar">
+        <div class="header-title-group">
+          <h2 class="header-title">Simulado AWS CLF-C02</h2>
+          <p class="header-subtitle">AWS Certified Cloud Practitioner - 65 Questões</p>
+        </div>
+        <div class="header-controls">
+          <div class="timer-stack">
+            <div class="timer-badge" id="timer-badge" title="Clique para iniciar. Em modo estudo, clique novamente para pausar." aria-live="polite">
+              <span id="timer-display">00:00</span>
+            </div>
+            <div id="timer-hint" class="timer-hint">Clique no relógio para iniciar a contagem.</div>
+          </div>
+          <button id="btn-mode" class="lumi-btn lumi-btn--tonal lumi-btn--small" onclick="toggleMode()">Modo: Estudo</button>
+        </div>
+      </div>
+
+      <!-- Filtros de Navegação por Domínio -->
+      <div class="domain-pills-row" id="domain-filters">
+        <button class="lumi-chip is-active" data-domain="ALL" onclick="setDomainFilter('ALL', this)">Todas (65)</button>
+        <button class="lumi-chip" data-domain="D1" onclick="setDomainFilter('D1', this)">Conceitos (16)</button>
+        <button class="lumi-chip" data-domain="D2" onclick="setDomainFilter('D2', this)">Segurança (19)</button>
+        <button class="lumi-chip" data-domain="D3" onclick="setDomainFilter('D3', this)">Tecnologia (22)</button>
+        <button class="lumi-chip" data-domain="D4" onclick="setDomainFilter('D4', this)">Cobrança (8)</button>
+      </div>
+
+      <!-- Grelha de Navegação das Questões -->
+      <div class="q-grid-toggle" id="q-grid-container">
+        <!-- Os botões das questões serão renderizados aqui via JavaScript -->
+      </div>
+
+      <!-- PÁGINA DE INSTRUÇÕES -->
+      <div id="instructions-view" class="instructions-view">
+        <div class="instructions-card">
+          <h3>Guia de uso do simulado</h3>
+          <ol>
+            <li>Clique no relógio no topo da página para iniciar o cronômetro.</li>
+            <li>Em modo estudo, o relógio pode ser pausado e a explicação pode ser consultada.</li>
+            <li>Em modo prova, a explicação fica oculta e o cronômetro não pode ser pausado.</li>
+            <li>Responda as questões em sequência ou navegue por números.</li>
+            <li>Ao finalizar, o sistema gera o relatório final com aproveitamento por domínio.</li>
+          </ol>
+          <div class="instructions-actions">
+            <button class="lumi-btn lumi-btn--bright lumi-btn--small" onclick="startTimer()">Iniciar simulado</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA DO SIMULADOR (QUIZ VIEW) -->
+      <div id="quiz-view">
+        <div class="question-card">
+          <div class="meta-row">
+            <span class="domain-tag" id="q-domain-label">Domínio 1: Conceitos de Nuvem</span>
+            <span id="q-progress-label">Questão 1 de 65</span>
+          </div>
+
+          <p class="question-text" id="q-text">A carregar questão...</p>
+
+          <div class="options-list" id="q-options">
+            <!-- As alternativas serão construídas dinamicamente aqui -->
+          </div>
+
+          <div class="explanation-box" id="q-explanation">
+            <strong>Explicação:</strong> <span id="explanation-text"></span>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="nav-btn-group">
+            <button id="btn-prev" class="lumi-btn lumi-btn--tonal lumi-btn--small" onclick="prevQuestion()">Anterior</button>
+            <button id="btn-next" class="lumi-btn lumi-btn--tonal lumi-btn--small" onclick="nextQuestion()">Próxima</button>
+          </div>
+          <div class="nav-btn-group">
+            <button id="btn-explain" class="lumi-btn lumi-btn--ghost lumi-btn--small" onclick="toggleExplanation()">Explicação</button>
+            <button class="lumi-btn lumi-btn--bright lumi-btn--small" onclick="finishQuiz()">Finalizar Prova</button>
+            <button class="lumi-btn lumi-btn--accent lumi-btn--small" onclick="generateNewSimulated()">Novo Simulado</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA DO RELATÓRIO (REPORT VIEW) -->
+      <div id="report-view" class="report-container">
+        <div class="score-banner">
+          <div>
+            <div style="font-size: 13px; color: var(--on-surface-variant);">Pontuação Total</div>
+            <div class="score-number" id="final-score-pct">0%</div>
+            <div style="font-size: 12px; color: var(--on-surface-variant);" id="final-score-count">0 de 65 acertos</div>
+          </div>
+          <div id="status-pill-badge" class="status-pill status-passed">Aprovado</div>
+        </div>
+
+        <div>
+          <h3 class="lumi-headline-s" style="margin-bottom: 8px;">Desempenho por Domínio</h3>
+          <div class="chart-box">
+            <canvas id="reportChart"></canvas>
+          </div>
+        </div>
+
+        <div id="domain-feedback-list" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Os cartões de feedback por domínio serão gerados via JavaScript -->
+        </div>
+
+        <div class="action-row" style="justify-content: flex-end; margin-top: 8px;">
+          <button class="lumi-btn lumi-btn--tonal lumi-btn--small" onclick="reviewQuiz()">Revisar Respostas</button>
+          <button class="lumi-btn lumi-btn--accent lumi-btn--small" onclick="generateNewSimulated()">Gerar Novo Simulado</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Importação do ficheiro JavaScript externo -->
+  <script src="script.js"></script>
+</body>
+</html>
